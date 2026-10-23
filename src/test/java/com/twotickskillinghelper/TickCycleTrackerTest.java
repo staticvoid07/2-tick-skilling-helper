@@ -71,15 +71,23 @@ public class TickCycleTrackerTest
 	{
 		// Hits at 0, 2, then 5 (1 tick late), then every 2 from there
 		assertArrayEquals(
-			new TickState[]{CLICK, WAIT, CLICK, WAIT, WAIT, CLICK, WAIT, CLICK},
+			new TickState[]{CLICK, WAIT, CLICK, WAIT, SKIP, CLICK, WAIT, CLICK},
 			run("x.x..x.x", 0));
+	}
+
+	@Test
+	public void latePidSwapWithOffsetLosesATick()
+	{
+		assertArrayEquals(
+			new TickState[]{WAIT, CLICK, WAIT, CLICK, WAIT, SKIP, CLICK, WAIT},
+			run("x.x..x.x", 1));
 	}
 
 	@Test
 	public void earlyPidSwapWithOffsetLosesATick()
 	{
 		assertArrayEquals(
-			new TickState[]{WAIT, CLICK, WAIT, WAIT, CLICK, WAIT, CLICK, WAIT},
+			new TickState[]{WAIT, CLICK, WAIT, SKIP, CLICK, WAIT, CLICK, WAIT},
 			run("x.xx.x.x", 1));
 	}
 
@@ -96,7 +104,7 @@ public class TickCycleTrackerTest
 	public void goesIdleAfterTimeout()
 	{
 		assertArrayEquals(
-			new TickState[]{CLICK, WAIT, WAIT, WAIT, WAIT, IDLE},
+			new TickState[]{CLICK, WAIT, SKIP, WAIT, WAIT, IDLE},
 			run("x.....", 0));
 	}
 

@@ -8,7 +8,8 @@ import lombok.Getter;
  * <p>
  * Hits normally land every 2 ticks. When PID swaps in PvP, one interval becomes 1 or 3 ticks; the cycle then
  * continues on the opposite tick parity. Clicks are never shown less than {@link #CYCLE_LENGTH} ticks apart, so after
- * a swap the player loses a tick (a 3 tick gap) and is back in cycle with the new PIDs.
+ * a swap the player loses a tick (a 3 tick gap) and is back in cycle with the new PIDs. The lost tick is shown as
+ * {@link TickState#SKIP}.
  */
 class TickCycleTracker
 {
@@ -25,6 +26,7 @@ class TickCycleTracker
 	private boolean hitThisTick;
 	private int lastHitTick = NONE;
 	private int lastClickTick = NONE;
+	private int lastSkipTick = NONE;
 	private int pidSwapTick = NONE;
 
 	@Getter
@@ -63,22 +65,30 @@ class TickCycleTracker
 			state = TickState.IDLE;
 			lastHitTick = NONE;
 			lastClickTick = NONE;
+			lastSkipTick = NONE;
 			pidSwapTick = NONE;
 			return;
 		}
 
-		if (tick - lastHitTick != clickOffset)
-		{
-			state = TickState.WAIT;
-		}
-		else if (lastClickTick != NONE && tick - lastClickTick < CYCLE_LENGTH)
-		{
-			state = TickState.SKIP;
-		}
-		else
+		boolean onClickTick = tick - lastHitTick == clickOffset;
+		boolean tooSoon = lastClickTick != NONE && tick - lastClickTick < CYCLE_LENGTH;
+		// The regular click is due but there is no hit to click on, e.g. the hit is a tick late after a PID swap
+		boolean clickMissed = !onClickTick && lastClickTick != NONE && tick - lastClickTick == CYCLE_LENGTH
+			&& lastSkipTick < lastClickTick;
+
+		if (onClickTick && !tooSoon)
 		{
 			state = TickState.CLICK;
 			lastClickTick = tick;
+		}
+		else if (onClickTick || clickMissed)
+		{
+			state = TickState.SKIP;
+			lastSkipTick = tick;
+		}
+		else
+		{
+			state = TickState.WAIT;
 		}
 	}
 
@@ -96,6 +106,7 @@ class TickCycleTracker
 		hitThisTick = false;
 		lastHitTick = NONE;
 		lastClickTick = NONE;
+		lastSkipTick = NONE;
 		pidSwapTick = NONE;
 		state = TickState.IDLE;
 	}

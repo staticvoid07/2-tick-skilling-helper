@@ -20,7 +20,7 @@ enum TickState
 	 */
 	WAIT("WAIT"),
 	/**
-	 * Would be a click tick, but the cycle just shifted (PID swap), so this click must be skipped to lose a tick.
+	 * Would be a click tick, but the cycle is shifting (PID swap), so this click must be skipped to lose a tick.
 	 */
 	SKIP("SKIP");
 

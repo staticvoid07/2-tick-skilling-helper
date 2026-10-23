@@ -10,7 +10,7 @@ Many 2-tick methods (such as 2-tick fishing) rely on an NPC, or another player o
 - **On-screen indicator** showing what to do each tick:
   - **CLICK**: click the target (e.g. the fishing spot) this tick
   - **WAIT**: off-cycle tick, do nothing
-  - **SKIP**: drop this click to lose a tick after a PID swap
+  - **SKIP**: don't click; this is the tick you lose when the cycle shifts after a PID swap
   - **IDLE**: nothing is hitting you
 - **Target highlight**: outlines the NPC you are skilling on (e.g. the fishing spot) on click ticks.
 - **PID swap handling**: on PvP worlds PID reshuffles often, which moves the attacker's hits by one tick. The plugin
